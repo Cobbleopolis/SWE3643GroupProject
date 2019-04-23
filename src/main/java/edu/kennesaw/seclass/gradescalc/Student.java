@@ -77,4 +77,18 @@ public class Student {
 	public int getId() {
 		return this.ID;
 	}
+	
+	/**
+	 * Sets the id of the student object
+	 * @precondition email != null || !email.isEmpty()
+	 * @postcondition email == email
+	 * @param email the new email
+	 */
+	public void setId(int id) {
+		if (id < 0) {
+			throw new IllegalArgumentException("Id cannot be negative");
+		}
+		id = this.ID;	
+	}
+	
 }
