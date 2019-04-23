@@ -4,37 +4,59 @@ package edu.kennesaw.seclass.gradescalc;
  * A class that represents a single student.
  */
 public class Student {
+    /**
+     * The name of the student.
+     */
     private String name;
-    private String ID;
-    private String email;
-    private double C;
-    private double CPP;
-    private double Java;
-    private boolean CSEx;
 
+    /**
+     * The name of the student.
+     */
+    private String id;
+
+    /**
+     * The email of the student.
+     */
+    private String email;
+
+    /**
+     * The C value of the student.
+     */
+    private double C;
+
+    /**
+     * The CPP value of the student.
+     */
+    private double CPP;
+
+    /**
+     * The Java value of the student.
+     */
+    private double Java;
+
+    /**
+     * The CSEX value of the student.
+     */
+    private boolean CSEX;
+
+    /**
+     * The GradesDB that this student is a part of.
+     */
     private GradesDB gradesDB;
 
     /**
-     * Creates and setsup a Student class with a given name. Email,
+     * Creates and sets up a Student class.
      *
-     * @param name The name of the student
-     * @precondition name != null || name != .IsEmpty()
-     * @postcondition creates Student object
+     * @param name The name of the student.
+     * @param id The id of the student.
+     * @param email The email of the student.
+     * @param C The C value of the student.
+     * @param CPP The CPP value of the student.
+     * @param Java The Java value of the student.
+     * @param CSEX The CSEX value of the student.
+     * @param gradesDB The GradesDB that the student is a part of.
      */
     public Student(String name, String id, String email, double C, double CPP, double Java, boolean CSEX, GradesDB gradesDB) {
-        IllegalArgumentExceptionMethods(name, email, C, CPP, Java);
-
-        this.name = name;
-        this.ID = "";
-        this.email = "";
-        this.C = C;
-        this.CPP = CPP;
-        this.Java = Java;
-        this.CSEx = CSEX;
-        this.gradesDB = gradesDB;
-    }
-
-    private void IllegalArgumentExceptionMethods(String name, String email, double C, double CPP, double Java) {
         if (name == null) {
             throw new IllegalArgumentException("Name is invalid");
         }
@@ -56,123 +78,138 @@ public class Student {
         if (Java < 0) {
             throw new IllegalArgumentException("C cannot be less than 0");
         }
-    }
 
-    public String getID() {
-        return ID;
-    }
-
-    public void setID(String iD) {
-        ID = iD;
-    }
-
-    public double getC() {
-        return C;
-    }
-
-    public void setC(double c) {
-        C = c;
-    }
-
-    public double getCPP() {
-        return CPP;
-    }
-
-    public void setCPP(double cPP) {
-        CPP = cPP;
-    }
-
-    public double getJava() {
-        return Java;
-    }
-
-    public void setJava(double java) {
-        Java = java;
-    }
-
-    public boolean isCSEx() {
-        return CSEx;
-    }
-
-    public void setCSEx(boolean cSEx) {
-        CSEx = cSEx;
-    }
-
-    public double getAttendance() {
-        return gradesDB.getStudentAttendance(getName());
+        this.name = name;
+        this.id = id;
+        this.email = email;
+        this.C = C;
+        this.CPP = CPP;
+        this.Java = Java;
+        this.CSEX = CSEX;
+        this.gradesDB = gradesDB;
     }
 
     /**
-     * Gets the name of the student
+     * Gets the name of the student.
      *
-     * @return name the name of the student
-     * @precondition none
-     * @postcondition none
+     * @return name the name of the student.
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * Sets the name of the student object
+     * Sets the name of the student object.
      *
-     * @param name the new name
-     * @precondition name != null || !name.isEmpty()
-     * @postcondition name == name
+     * @param name The new name.
      */
     public void setName(String name) {
         name = this.name;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String iD) {
+        id = iD;
+    }
+
     /**
-     * Gets the email of the student
+     * Gets the email of the student.
      *
-     * @return email the email of the student
-     * @precondition none
-     * @postcondition none
+     * @return email the email of the student.
      */
     public String getEmail() {
         return this.email;
     }
 
     /**
-     * Sets the email of the student object
+     * Sets the email of the student object.
      *
-     * @param email the new email
-     * @precondition email != null || !email.isEmpty()
-     * @postcondition email == email
+     * @param email the new email.
      */
     public void setEmail(String email) {
         email = this.email;
     }
 
     /**
-     * Returns the id of the student object
+     * Gets the C value of the student.
      *
-     * @return id The id of the student
-     * @precondition none
-     * @postcondition none
+     * @return The C value of the student.
      */
-    public String getId() {
-        return this.ID;
+    public double getC() {
+        return C;
     }
 
     /**
-     * Sets the id of the student object
+     * Sets the C value of the student.
      *
-     * @param id the new id
-     * @precondition id != null || !id.isEmpty()
-     * @postcondition id == id
+     * @param c The new C value of the student.
      */
-    public void setId(String id) {
-        if (id == null) {
-            throw new IllegalArgumentException("id is invalid");
-        }
-        if (id.isEmpty()) {
-            throw new IllegalArgumentException("id is Empty");
-        }
-
-        id = this.ID;
+    public void setC(double c) {
+        C = c;
     }
 
+    /**
+     * Gets the CPP value of the student.
+     *
+     * @return The CPP value of the student.
+     */
+    public double getCPP() {
+        return CPP;
+    }
+
+    /**
+     * Sets the CPP value of the student.
+     *
+     * @param cpp The new CPP value of the student.
+     */
+    public void setCPP(double cpp) {
+        CPP = cpp;
+    }
+
+    /**
+     * Gets the Java value of the student.
+     *
+     * @return The Java value of the student.
+     */
+    public double getJava() {
+        return Java;
+    }
+
+    /**
+     * Sets the Java value of the student.
+     *
+     * @param java The new java value of the student.
+     */
+    public void setJava(double java) {
+        Java = java;
+    }
+
+    /**
+     * Gets the CSEX value of the student.
+     *
+     * @return The CSEX value of the student.
+     */
+    public boolean getCSEX() {
+        return CSEX;
+    }
+
+    /**
+     * Sets the CSEX value of the student.
+     *
+     * @param csex The new CSEX value of the student.
+     */
+    public void setCSEX(boolean csex) {
+        CSEX = csex;
+    }
+
+    /**
+     * Gets the student's attendance value from the database.
+     * @return The student's attendance from the database.
+     */
+    public double getAttendance() {
+        return gradesDB.getStudentAttendance(getName());
+    }
 }
