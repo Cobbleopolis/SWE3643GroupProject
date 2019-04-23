@@ -45,9 +45,36 @@ public class Student {
 	 * @param name the new name
 	 */
 	public void setName(String name ) {
-		name = this.name;
-		
+		name = this.name;	
 	}
 	
-
+	/**
+	 * Gets the email of the student
+	 * @precondition none
+	 * @postcondition none
+	 * @return email the email of the student
+	 */
+	public String getEmail() {
+		return this.email;
+	}
+	
+	/**
+	 * Sets the email of the student object
+	 * @precondition email != null || !email.isEmpty()
+	 * @postcondition email == email
+	 * @param email the new email
+	 */
+	public void setEmail(String email ) {
+		email = this.email;	
+	}
+	
+	/**
+	 * Returns the id of the student object
+	 * @precondition none
+	 * @postcondition none
+	 * @return id The id of the student
+	 */
+	public int getId() {
+		return this.ID;
+	}
 }
