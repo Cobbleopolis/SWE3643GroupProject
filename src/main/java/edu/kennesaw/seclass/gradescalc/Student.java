@@ -12,6 +12,8 @@ public class Student {
     private double Java;
     private boolean CSEx;
 
+    private GradesDB gradesDB;
+
     /**
      * Creates and setsup a Student class with a given name. Email,
      *
@@ -19,7 +21,7 @@ public class Student {
      * @precondition name != null || name != .IsEmpty()
      * @postcondition creates Student object
      */
-    public Student(String name, String id, String email, double C, double CPP, double Java, boolean CSEX) {
+    public Student(String name, String id, String email, double C, double CPP, double Java, boolean CSEX, GradesDB gradesDB) {
         IllegalArgumentExceptionMethods(name, email, C, CPP, Java);
 
         this.name = name;
@@ -29,6 +31,7 @@ public class Student {
         this.CPP = CPP;
         this.Java = Java;
         this.CSEx = CSEX;
+        this.gradesDB = gradesDB;
     }
 
     private void IllegalArgumentExceptionMethods(String name, String email, double C, double CPP, double Java) {
@@ -93,6 +96,10 @@ public class Student {
 
     public void setCSEx(boolean cSEx) {
         CSEx = cSEx;
+    }
+
+    public double getAttendance() {
+        return gradesDB.getStudentAttendance(getName());
     }
 
     /**

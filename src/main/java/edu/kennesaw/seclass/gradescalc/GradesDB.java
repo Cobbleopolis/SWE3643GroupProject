@@ -1,47 +1,186 @@
 package edu.kennesaw.seclass.gradescalc;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A class that represents all the grades from the database
  */
 public class GradesDB {
 
-    XSSFWorkbook workbook = null;
-    HashSet<Student> students;
+    private HashSet<Student> students = new HashSet<>();
+    private HashMap<String, String[]> teams = new HashMap<>();
+    private HashMap<String, Double> attendance = new HashMap<>();
+    private HashMap<String, HashMap<String, Double>> individualGrades = new HashMap<>();
+    private HashMap<String, HashMap<String, Double>> individualContrib = new HashMap<>();
+    private HashMap<String, HashMap<String, Double>> teamGrades = new HashMap<>();
+
 
     /**
      * Creates a GradesDB class.
+     *
      * @param dbPath The path of the db excel file.
-     * @throws IOException
-     * @throws InvalidFormatException
+     * @throws IOException            If reading the stream fails.
+     * @throws InvalidFormatException If the specified file doesn't exist, and a parsing error occur.
      */
     public GradesDB(String dbPath) throws IOException, InvalidFormatException {
         File file = new File(Objects.requireNonNull(getClass().getClassLoader().getResource(dbPath)).getFile());
-        workbook = new XSSFWorkbook(file);
-        XSSFSheet studentInfo = workbook.getSheet("StudentsInfo");
-        for(int i = studentInfo.getFirstRowNum() + 1; i <= studentInfo.getLastRowNum(); i++) {
-            //TODO add to students HashSet once students class is done
+        XSSFWorkbook workbook = new XSSFWorkbook(file);
+
+        // Read the student info into the DB
+        XSSFSheet studentInfoSheet = workbook.getSheet("StudentsInfo");
+        List<Integer> studentInfoBreaks = getSheetBreaks(studentInfoSheet);
+        for (int i = studentInfoSheet.getFirstRowNum() + 1; i <= studentInfoSheet.getLastRowNum(); i++) {
+            if (studentInfoBreaks.contains(i))
+                continue;
+            XSSFRow row = studentInfoSheet.getRow(i);
+            XSSFCell sixthCell = row.getCell(6);
+            students.add(new Student(
+                    row.getCell(0).getStringCellValue(),
+                    Double.toString(row.getCell(1).getNumericCellValue()),
+                    row.getCell(2).getStringCellValue(),
+                    row.getCell(3).getNumericCellValue(),
+                    row.getCell(4).getNumericCellValue(),
+                    row.getCell(5).getNumericCellValue(),
+                    sixthCell != null && !sixthCell.getStringCellValue().equals("N"),
+                    this
+            ));
         }
+
+        // Read the team info into the DB
+        XSSFSheet teamsSheet = workbook.getSheet("Teams");
+        List<Integer> teamsBreaks = getSheetBreaks(teamsSheet);
+        for (int i = teamsSheet.getFirstRowNum() + 1; i <= teamsSheet.getLastRowNum(); i++) {
+            if (teamsBreaks.contains(i))
+                continue;
+            XSSFRow row = teamsSheet.getRow(i);
+            String teamName = row.getCell(0).getStringCellValue();
+            List<String> membersList = new ArrayList<>();
+            for (int j = row.getFirstCellNum() + 1; j <= row.getLastCellNum(); j++) {
+                XSSFCell cell = row.getCell(j);
+                if (cell == null)
+                    continue;
+                membersList.add(cell.getStringCellValue());
+            }
+            teams.put(teamName, membersList.toArray(new String[0]));
+        }
+
+
+        // Read the attendance info into the DB
+        XSSFSheet attendanceSheet = workbook.getSheet("Attendance");
+        List<Integer> attendanceBreaks = getSheetBreaks(attendanceSheet);
+        for (int i = attendanceSheet.getFirstRowNum() + 1; i <= studentInfoSheet.getLastRowNum(); i++) {
+            if (attendanceBreaks.contains(i))
+                continue;
+            XSSFRow row = attendanceSheet.getRow(i);
+            attendance.put(row.getCell(0).getStringCellValue(), row.getCell(1).getNumericCellValue());
+        }
+
+        // Read the individual grades into the DB
+        XSSFSheet individualGradesSheet = workbook.getSheet("IndividualGrades");
+        List<Integer> individualGradesBreaks = getSheetBreaks(individualGradesSheet);
+        String[] individualGradesHeaders = getHeaders(individualGradesSheet);
+        for (int i = individualGradesSheet.getFirstRowNum() + 1; i <= individualGradesSheet.getLastRowNum(); i++) {
+            if (individualGradesBreaks.contains(i))
+                continue;
+            XSSFRow row = individualGradesSheet.getRow(i);
+            String studentName = "";
+            HashMap<String, Double> assignmentGrades = new HashMap<>();
+            for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
+                XSSFCell cell = row.getCell(j);
+                if (cell == null)
+                    continue;
+
+                if (cell.getCellType() == CellType.STRING)
+                    studentName = cell.getStringCellValue();
+                else if (cell.getCellType() == CellType.NUMERIC)
+                    assignmentGrades.put(individualGradesHeaders[j], cell.getNumericCellValue());
+            }
+            individualGrades.put(studentName, assignmentGrades);
+        }
+
+        // Read the individual contributions into the DB
+        XSSFSheet individualContribSheet = workbook.getSheet("IndividualContribs");
+        List<Integer> individualContribBreaks = getSheetBreaks(individualContribSheet);
+        String[] individualContribHeaders = getHeaders(individualContribSheet);
+        for (int i = individualContribSheet.getFirstRowNum() + 1; i <= individualContribSheet.getLastRowNum(); i++) {
+            if (individualContribBreaks.contains(i))
+                continue;
+            XSSFRow row = individualContribSheet.getRow(i);
+            String studentName = "";
+            HashMap<String, Double> assignmentGrades = new HashMap<>();
+            for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
+                if (j < 0)
+                    continue;
+                XSSFCell cell = row.getCell(j);
+                if (cell == null)
+                    continue;
+
+                if (cell.getCellType() == CellType.STRING)
+                    studentName = cell.getStringCellValue();
+                else if (cell.getCellType() == CellType.NUMERIC)
+                    assignmentGrades.put(individualContribHeaders[j], cell.getNumericCellValue());
+            }
+            individualContrib.put(studentName, assignmentGrades);
+        }
+
+        // Read the team grades into the DB
+        XSSFSheet teamGradesSheet = workbook.getSheet("TeamGrades");
+        List<Integer> teamGradesBreaks = getSheetBreaks(teamGradesSheet);
+        String[] teamGradesHeaders = getHeaders(teamGradesSheet);
+        for (int i = teamGradesSheet.getFirstRowNum() + 1; i <= teamGradesSheet.getLastRowNum(); i++) {
+            if (teamGradesBreaks.contains(i))
+                continue;
+            XSSFRow row = teamGradesSheet.getRow(i);
+            String studentName = "";
+            HashMap<String, Double> assignmentGrades = new HashMap<>();
+            for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
+                XSSFCell cell = row.getCell(j);
+                if (cell == null)
+                    continue;
+
+                if (cell.getCellType() == CellType.STRING)
+                    studentName = cell.getStringCellValue();
+                else if (cell.getCellType() == CellType.NUMERIC)
+                    assignmentGrades.put(teamGradesHeaders[j], cell.getNumericCellValue());
+            }
+            teamGrades.put(studentName, assignmentGrades);
+        }
+    }
+
+    private List<Integer> getSheetBreaks(XSSFSheet sheet) {
+        return Arrays.stream(sheet.getRowBreaks()).boxed().collect(Collectors.toList());
+    }
+
+    private String[] getHeaders(XSSFSheet sheet) {
+        List<String> headersList = new ArrayList<>();
+        sheet.getRow(sheet.getFirstRowNum()).cellIterator().forEachRemaining(
+                (cell) -> headersList.add(cell.getStringCellValue())
+        );
+        return headersList.toArray(new String[0]);
     }
 
     /**
      * Gets the number of students in the database.
+     *
      * @return The number of students.
      */
     public int getNumStudents() {
-        return -1; //TODO Actually count the number of students.
+        return students.size();
     }
 
     /**
      * Gets the number of assignments in the database.
+     *
      * @return The number of assignments.
      */
     public int getNumAssignments() {
@@ -50,6 +189,7 @@ public class GradesDB {
 
     /**
      * Gets the number of projects in the database.
+     *
      * @return The number of projects.
      */
     public int getNumProjects() {
@@ -58,6 +198,7 @@ public class GradesDB {
 
     /**
      * Gets the all the students in the database.
+     *
      * @return All the students in the database.
      */
     public HashSet<Student> getStudents() {
@@ -66,7 +207,8 @@ public class GradesDB {
 
     /**
      * Gets a specific student from the database.
-     * @param studentName The name of the student to find
+     *
+     * @param studentName The name of the student to find.
      * @return Returns the student with the matching name, null if the student could not be found.
      */
     public Student getStudentByName(String studentName) {
@@ -75,13 +217,22 @@ public class GradesDB {
 
     /**
      * Gets a specific student from the database.
-     * @param studentId The id of the student to find
+     *
+     * @param studentId The id of the student to find.
      * @return Returns the student with the matching id, null if the student could not be found.
      */
     public Student getStudentByID(String studentId) {
         return null; //TODO actually get the student.
     }
-    
-    
+
+    /**
+     * Gets a student's attendance.
+     * @param studentName The name of the student to get the attendance for.
+     * @return The attendance of the student. Returns -1 if the student is not found.
+     */
+    public Double getStudentAttendance(String studentName) {
+        return attendance.getOrDefault(studentName, -1d);
+    }
+
 
 }
