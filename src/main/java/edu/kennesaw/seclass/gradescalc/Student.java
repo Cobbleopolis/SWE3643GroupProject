@@ -47,13 +47,13 @@ public class Student {
     /**
      * Creates and sets up a Student class.
      *
-     * @param name The name of the student.
-     * @param id The id of the student.
-     * @param email The email of the student.
-     * @param C The C value of the student.
-     * @param CPP The CPP value of the student.
-     * @param Java The Java value of the student.
-     * @param CSEX The CSEX value of the student.
+     * @param name     The name of the student.
+     * @param id       The id of the student.
+     * @param email    The email of the student.
+     * @param C        The C value of the student.
+     * @param CPP      The CPP value of the student.
+     * @param Java     The Java value of the student.
+     * @param CSEX     The CSEX value of the student.
      * @param gradesDB The GradesDB that the student is a part of.
      */
     public Student(String name, String id, String email, double C, double CPP, double Java, boolean CSEX, GradesDB gradesDB) {
@@ -92,10 +92,10 @@ public class Student {
     /**
      * Gets the name of the student.
      *
-     * @return name the name of the student.
+     * @return The name of the student.
      */
     public String getName() {
-        return this.name;
+        return name;
     }
 
     /**
@@ -104,24 +104,34 @@ public class Student {
      * @param name The new name.
      */
     public void setName(String name) {
-        name = this.name;
+        this.name = name;
     }
 
+    /**
+     * Gets the id of the student.
+     *
+     * @return The name of the student.
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String iD) {
-        id = iD;
+    /**
+     * Sets the id of the student object.
+     *
+     * @param id The new id.
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
      * Gets the email of the student.
      *
-     * @return email the email of the student.
+     * @return The email of the student.
      */
     public String getEmail() {
-        return this.email;
+        return email;
     }
 
     /**
@@ -130,7 +140,7 @@ public class Student {
      * @param email the new email.
      */
     public void setEmail(String email) {
-        email = this.email;
+        this.email = email;
     }
 
     /**
@@ -148,7 +158,7 @@ public class Student {
      * @param c The new C value of the student.
      */
     public void setC(double c) {
-        C = c;
+        this.C = c;
     }
 
     /**
@@ -166,7 +176,7 @@ public class Student {
      * @param cpp The new CPP value of the student.
      */
     public void setCPP(double cpp) {
-        CPP = cpp;
+        this.CPP = cpp;
     }
 
     /**
@@ -184,7 +194,7 @@ public class Student {
      * @param java The new java value of the student.
      */
     public void setJava(double java) {
-        Java = java;
+        this.Java = java;
     }
 
     /**
@@ -202,11 +212,12 @@ public class Student {
      * @param csex The new CSEX value of the student.
      */
     public void setCSEX(boolean csex) {
-        CSEX = csex;
+        this.CSEX = csex;
     }
 
     /**
      * Gets the student's attendance value from the database.
+     *
      * @return The student's attendance from the database.
      */
     public double getAttendance() {
