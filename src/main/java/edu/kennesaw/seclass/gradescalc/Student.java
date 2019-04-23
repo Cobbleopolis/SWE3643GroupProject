@@ -28,10 +28,22 @@ public class Student {
 		this.email = "";
 	}
 	
+	/**
+	 * Gets the name of the student
+	 * @precondition none
+	 * @postcondition none
+	 * @return name the name of the student
+	 */
 	public String getName() {
 		return this.name;
 	}
 	
+	/**
+	 * Sets the name of the student object
+	 * @precondition name != null || !name.isEmpty()
+	 * @postcondition name == name
+	 * @param name the new name
+	 */
 	public void setName(String name ) {
 		name = this.name;
 		
