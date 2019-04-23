@@ -20,9 +20,9 @@ public class GradesDB {
     private HashSet<Student> students = new HashSet<>();
     private HashMap<String, String[]> teams = new HashMap<>();
     private HashMap<String, Double> attendance = new HashMap<>();
-    private HashMap<String, HashMap<String, Double>> individualGrades = new HashMap<>();
-    private HashMap<String, HashMap<String, Double>> individualContrib = new HashMap<>();
-    private HashMap<String, HashMap<String, Double>> teamGrades = new HashMap<>();
+    private HashMap<String, HashMap<String, Double>> individualGrades;
+    private HashMap<String, HashMap<String, Double>> individualContrib;
+    private HashMap<String, HashMap<String, Double>> teamGrades;
 
 
     /**
@@ -46,7 +46,7 @@ public class GradesDB {
             XSSFCell sixthCell = row.getCell(6);
             students.add(new Student(
                     row.getCell(0).getStringCellValue(),
-                    Double.toString(row.getCell(1).getNumericCellValue()),
+                    Integer.toString((int) row.getCell(1).getNumericCellValue()),
                     row.getCell(2).getStringCellValue(),
                     row.getCell(3).getNumericCellValue(),
                     row.getCell(4).getNumericCellValue(),
@@ -99,6 +99,7 @@ public class GradesDB {
         XSSFSheet teamGradesSheet = workbook.getSheet("TeamGrades");
         teamGrades = get2DHashMapFromSheet(teamGradesSheet);
 
+        workbook.close();
     }
 
     private List<Integer> getSheetBreaks(XSSFSheet sheet) {
@@ -157,7 +158,7 @@ public class GradesDB {
      * @return The number of assignments.
      */
     public int getNumAssignments() {
-        return -1; //TODO Actually count the number of assignments.
+        return individualGrades.size();
     }
 
     /**
@@ -166,7 +167,7 @@ public class GradesDB {
      * @return The number of projects.
      */
     public int getNumProjects() {
-        return -1; //TODO Actually count the number of projects.
+        return teamGrades.size();
     }
 
     /**
@@ -186,7 +187,7 @@ public class GradesDB {
      */
     public Student getStudentByName(String studentName) {
         for(Student student : students)
-            if (student.getName().equals(studentName))
+            if (student.getName().compareTo(studentName) == 0)
                 return student;
         return null;
     }
@@ -199,7 +200,7 @@ public class GradesDB {
      */
     public Student getStudentByID(String studentId) {
         for(Student student : students)
-            if (student.getId().equals(studentId))
+            if (student.getId().compareTo(studentId) == 0)
                 return student;
         return null;
     }

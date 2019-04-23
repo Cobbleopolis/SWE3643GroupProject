@@ -76,7 +76,7 @@ public class GradesDBTest {
     public void testGetStudentsByName2() {
         Student student = null;
         student = db.getStudentByName("Grier Nehling");
-        assertEquals(96, student.getAttendance());
+        assertEquals(96, student.getAttendance(), 0d);
     }
 
     @Test
