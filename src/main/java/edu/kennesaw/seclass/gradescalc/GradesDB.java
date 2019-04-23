@@ -87,74 +87,18 @@ public class GradesDB {
 
         // Read the individual grades into the DB
         XSSFSheet individualGradesSheet = workbook.getSheet("IndividualGrades");
-        List<Integer> individualGradesBreaks = getSheetBreaks(individualGradesSheet);
-        String[] individualGradesHeaders = getHeaders(individualGradesSheet);
-        for (int i = individualGradesSheet.getFirstRowNum() + 1; i <= individualGradesSheet.getLastRowNum(); i++) {
-            if (individualGradesBreaks.contains(i))
-                continue;
-            XSSFRow row = individualGradesSheet.getRow(i);
-            String studentName = "";
-            HashMap<String, Double> assignmentGrades = new HashMap<>();
-            for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
-                XSSFCell cell = row.getCell(j);
-                if (cell == null)
-                    continue;
+        individualGrades = get2DHashMapFromSheet(individualGradesSheet);
 
-                if (cell.getCellType() == CellType.STRING)
-                    studentName = cell.getStringCellValue();
-                else if (cell.getCellType() == CellType.NUMERIC)
-                    assignmentGrades.put(individualGradesHeaders[j], cell.getNumericCellValue());
-            }
-            individualGrades.put(studentName, assignmentGrades);
-        }
 
         // Read the individual contributions into the DB
         XSSFSheet individualContribSheet = workbook.getSheet("IndividualContribs");
-        List<Integer> individualContribBreaks = getSheetBreaks(individualContribSheet);
-        String[] individualContribHeaders = getHeaders(individualContribSheet);
-        for (int i = individualContribSheet.getFirstRowNum() + 1; i <= individualContribSheet.getLastRowNum(); i++) {
-            if (individualContribBreaks.contains(i))
-                continue;
-            XSSFRow row = individualContribSheet.getRow(i);
-            String studentName = "";
-            HashMap<String, Double> assignmentGrades = new HashMap<>();
-            for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
-                if (j < 0)
-                    continue;
-                XSSFCell cell = row.getCell(j);
-                if (cell == null)
-                    continue;
+        individualContrib = get2DHashMapFromSheet(individualContribSheet);
 
-                if (cell.getCellType() == CellType.STRING)
-                    studentName = cell.getStringCellValue();
-                else if (cell.getCellType() == CellType.NUMERIC)
-                    assignmentGrades.put(individualContribHeaders[j], cell.getNumericCellValue());
-            }
-            individualContrib.put(studentName, assignmentGrades);
-        }
 
         // Read the team grades into the DB
         XSSFSheet teamGradesSheet = workbook.getSheet("TeamGrades");
-        List<Integer> teamGradesBreaks = getSheetBreaks(teamGradesSheet);
-        String[] teamGradesHeaders = getHeaders(teamGradesSheet);
-        for (int i = teamGradesSheet.getFirstRowNum() + 1; i <= teamGradesSheet.getLastRowNum(); i++) {
-            if (teamGradesBreaks.contains(i))
-                continue;
-            XSSFRow row = teamGradesSheet.getRow(i);
-            String studentName = "";
-            HashMap<String, Double> assignmentGrades = new HashMap<>();
-            for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
-                XSSFCell cell = row.getCell(j);
-                if (cell == null)
-                    continue;
+        teamGrades = get2DHashMapFromSheet(teamGradesSheet);
 
-                if (cell.getCellType() == CellType.STRING)
-                    studentName = cell.getStringCellValue();
-                else if (cell.getCellType() == CellType.NUMERIC)
-                    assignmentGrades.put(teamGradesHeaders[j], cell.getNumericCellValue());
-            }
-            teamGrades.put(studentName, assignmentGrades);
-        }
     }
 
     private List<Integer> getSheetBreaks(XSSFSheet sheet) {
@@ -167,6 +111,35 @@ public class GradesDB {
                 (cell) -> headersList.add(cell.getStringCellValue())
         );
         return headersList.toArray(new String[0]);
+    }
+
+    private HashMap<String, HashMap<String, Double>> get2DHashMapFromSheet(XSSFSheet sheet) {
+        HashMap<String, HashMap<String, Double>> finalHashMap = new HashMap<>();
+        List<Integer> sheetBreaks = getSheetBreaks(sheet);
+        String[] headers = getHeaders(sheet);
+        for(int i = 1; i < headers.length; i++)
+            finalHashMap.put(headers[i], new HashMap<>());
+        for (int i = sheet.getFirstRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
+            if (sheetBreaks.contains(i))
+                continue;
+            XSSFRow row = sheet.getRow(i);
+            String name = "";
+            HashMap<String, Double> assignmentGrades = new HashMap<>();
+            for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
+                if (j < 0)
+                    continue;
+                XSSFCell cell = row.getCell(j);
+                if (cell == null)
+                    continue;
+                if (cell.getCellType() == CellType.STRING)
+                    name = cell.getStringCellValue();
+                else if (cell.getCellType() == CellType.NUMERIC)
+                    assignmentGrades.put(headers[j], cell.getNumericCellValue());
+            }
+            for(String assignment: assignmentGrades.keySet())
+                finalHashMap.getOrDefault(assignment, new HashMap<>()).put(name, assignmentGrades.getOrDefault(assignment, -1d));
+        }
+        return finalHashMap;
     }
 
     /**
@@ -212,7 +185,10 @@ public class GradesDB {
      * @return Returns the student with the matching name, null if the student could not be found.
      */
     public Student getStudentByName(String studentName) {
-        return null; //TODO actually get a student.
+        for(Student student : students)
+            if (student.getName().equals(studentName))
+                return student;
+        return null;
     }
 
     /**
@@ -222,7 +198,10 @@ public class GradesDB {
      * @return Returns the student with the matching id, null if the student could not be found.
      */
     public Student getStudentByID(String studentId) {
-        return null; //TODO actually get the student.
+        for(Student student : students)
+            if (student.getId().equals(studentId))
+                return student;
+        return null;
     }
 
     /**
