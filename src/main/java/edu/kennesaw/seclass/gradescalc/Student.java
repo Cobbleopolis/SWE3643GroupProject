@@ -1,4 +1,4 @@
-package src.main.java.edu.kennesaw.seclass.gradescalc;
+package edu.kennesaw.seclass.gradescalc;
 
 /**
  * A class that represents a single student.
